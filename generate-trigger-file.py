@@ -24,23 +24,18 @@ def main(args):
     inputBucket = args[2]
     prefix = args[3]
     localDir = args[4]
-    
+
     bucket = s3.get_bucket(inputBucket)
-    
+
     # create the dummy file
     filename = "lambda-redshift-trigger-file.dummy";
-    f = open(localDir + "/" + filename, 'w')
-    f.write("\n")
-    f.flush()
-    f.close()
-    
-    # upload the dummy to S3
-    f = open(localDir + "/" + filename, 'r')
-    key = bucket.new_key(prefix + "/" + filename)
-    key.set_contents_from_file(f)
-    f.close()
-    
-    sys.stdout.write("Wrote Dummy Trigger File to " + bucket.name + "/" + key.name);
+    with open(f"{localDir}/{filename}", 'w') as f:
+        f.write("\n")
+        f.flush()
+    with open(f"{localDir}/{filename}", 'r') as f:
+        key = bucket.new_key(f"{prefix}/{filename}")
+        key.set_contents_from_file(f)
+    sys.stdout.write(f"Wrote Dummy Trigger File to {bucket.name}/{key.name}");
 
 if __name__ == "__main__":
     main(sys.argv)
